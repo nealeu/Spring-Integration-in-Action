@@ -12,5 +12,7 @@
                              reply-channel="tripQuoteResponseChannel" />
    
 
+
+
     <si-http:outbound-gateway request-channel="" url="http://" />
 </beans>

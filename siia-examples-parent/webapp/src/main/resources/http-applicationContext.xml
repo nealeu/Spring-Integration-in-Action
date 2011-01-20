@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int-http="http://www.springframework.org/schema/integration/http"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xsi:schemaLocation="http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.0.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!-- This creates a bean that is a Spring HttpRequestHandler -->    
+    <int-http:inbound-channel-adapter id="httpSmsSubscriptionInboundChannelAdapter" 
+        channel="smsSubscriptionsChannel"
+        supported-methods="GET,POST"
+        />
+        <!-- 
+        request-payload-type="com.manning.siia.domain.notification.UpdateSubscription"  
+         -->
+        
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+    
+    <int:channel id="smsSubscriptionsChannel">
+        <int:queue capacity="2"/>
+    </int:channel> 
+</beans>
