@@ -8,7 +8,8 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import java.net.URI;
 
-import org.junit.Before;
+import javax.servlet.http.HttpServlet;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,11 @@ import org.springframework.web.multipart.MultipartResolver;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:http-applicationContext.xml"})
+@ContextConfiguration(locations = {"classpath:http-applicationContext.xml","classpath:http-servlet-applicationContext-TEST.xml"})
 public class SmsSubscriptionTest {
 
+    @Autowired
+    private HttpServlet smsServlet;
 
     @Autowired
     private HttpRequestHandler httpSmsSubscriptionInboundChannelAdapter;
@@ -48,15 +51,6 @@ public class SmsSubscriptionTest {
 
     private MessagingTemplate channelTemplate;
     
-    private MockHttpServletRequest request;
-    private MockHttpServletResponse response;
-    
-	@Before 
-    public void setUpMocks() throws IOException {
-		request = new MockHttpServletRequest("GET", "/updates/subscribe");
-		response = new MockHttpServletResponse();
-    }
-    
 
     @Autowired @Qualifier("smsSubscriptionsChannel")
     public void setChannel(MessageChannel messageChannel){
@@ -64,9 +58,10 @@ public class SmsSubscriptionTest {
         this.channelTemplate.setReceiveTimeout(100);
     }
 
-
 	@Test
     public void testFormSubmissionSucceedsAndCreatesMessage() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/subscribe");
+		MockHttpServletResponse response = new MockHttpServletResponse();
     	request.addParameter("smsNumber", "+1-612-555-1234");
     	request.addParameter("flight", "BA123");
     	request.addParameter("date", "2009-12-01");
@@ -78,35 +73,46 @@ public class SmsSubscriptionTest {
     	assertNotNull(message);
     	Object payload = message.getPayload();
     }
-
     
+	/**
+	 * An out of container test
+	 */
 	@Test
-    public void test() {
+    public void testViaRestTemplate() {
+		RestTemplate restTemplate = getRestTemplate(smsServlet);
+		doRequest(restTemplate);
+    }
+
+	
+	static private void doRequest(RestTemplate restTemplate) {
 		MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<String, Object>();
 		multipartMap.add("smsNumber", "+1-612-555-1234");
 		multipartMap.add("flight", "BA123");             
-		multipartMap.add("date", "2009-12-01");          
+		multipartMap.add("date", "2009-12-01");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(new MediaType("multipart", "form-data"));
 		HttpEntity<Object> request = new HttpEntity<Object>(multipartMap, headers);
 		
-		ResponseEntity<String> response = getRestTemplate(httpSmsSubscriptionInboundChannelAdapter).exchange("http://localhost/blah", HttpMethod.POST, request, String.class);
+		ResponseEntity<String> response = restTemplate.exchange("http://localhost:8080/siia-webapp/subscribe", HttpMethod.POST, request, String.class);
     	assertThat(response.getStatusCode(), is(HttpStatus.OK));
-    }
-
-	
-	private RestTemplate getRestTemplate(final HttpRequestHandler handler) {
-		
-		RestTemplate result = new RestTemplate(new ClientHttpRequestFactory() {
-			@Override
-			public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-				return new HandlerWrappingClientHttpRequest(uri, httpMethod, handler, multipartResolver);
-			}
-		});
-		
-		
-		return result;
 	}
 
+	/**
+	 * Get restTemplate that runs directly against httpServlet object
+	 */
+	private RestTemplate getRestTemplate(final HttpServlet servlet) {
+		return new RestTemplate(new ClientHttpRequestFactory() {
+			@Override
+			public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+				return new ServletWrappingClientHttpRequest(uri, httpMethod, servlet, multipartResolver);
+			}
+		});
+	}
     
+	/**
+	 * Uses real RestTemplate when have done mvn jetty:run (or STS Run-> Run on Server)
+	 */
+	public static void main(String[] args) {
+		doRequest(new RestTemplate());
+	}
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+    <bean id="smsServlet" class="com.manning.siia.http.ServletFactory" factory-method="getServlet">
+        <constructor-arg name="servletName" value="httpSmsSubscriptionInboundChannelAdapter"/>
+        <constructor-arg name="contextPath" value="/siia-webapp"/>
+        <constructor-arg name="initParams" >
+            <map>
+                <entry key="contextConfigLocation"  value="classpath:http-applicationContext.xml"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>
