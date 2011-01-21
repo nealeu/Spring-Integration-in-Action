@@ -11,7 +11,8 @@
     <!-- This creates a bean that is a Spring HttpRequestHandler -->    
     <int-http:inbound-channel-adapter id="httpSmsSubscriptionInboundChannelAdapter" 
         channel="smsSubscriptionsChannel"
-        supported-methods="GET,POST"
+        supported-methods="GET,POST" 
+        name="/subscribe"
         />
         <!-- 
         request-payload-type="com.manning.siia.domain.notification.UpdateSubscription"  
