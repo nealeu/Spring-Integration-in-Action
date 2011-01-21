@@ -9,10 +9,13 @@
 
     <si-http:inbound-gateway id="httpTripInboundGateway"
                              request-channel="tripQuoteRequestsChannel"
-                             reply-channel="tripQuoteResponseChannel" />
+                             reply-channel="tripQuoteResponseChannel"
+                             name="/quote"
+                             supported-methods="GET,POST"
+                              />
    
 
 
 
-    <si-http:outbound-gateway request-channel="" url="http://" />
+<!--    <si-http:outbound-gateway  id="httpOutboundGateway" request-channel="" url="http://" />-->
 </beans>
