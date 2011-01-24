@@ -93,7 +93,7 @@ public class SmsSubscriptionTest {
 		headers.setContentType(new MediaType("multipart", "form-data"));
 		HttpEntity<Object> request = new HttpEntity<Object>(multipartMap, headers);
 		
-		ResponseEntity<String> response = restTemplate.exchange("http://localhost:8080/siia-webapp/subscribe", HttpMethod.POST, request, String.class);
+		ResponseEntity<?> response = restTemplate.exchange("http://localhost:8080/siia-webapp/subscribe", HttpMethod.POST, request, null);
     	assertThat(response.getStatusCode(), is(HttpStatus.OK));
 	}
 
