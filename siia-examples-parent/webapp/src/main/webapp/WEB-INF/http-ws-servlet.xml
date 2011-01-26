@@ -7,10 +7,11 @@
        http://www.springframework.org/schema/integration/http
             http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
-    <si-http:inbound-gateway id="httpTripInboundGateway"
+    <import resource="classpath:trips-applicationContext.xml"/>
+
+    <si-http:inbound-gateway id="httpTripInboundGateway" name="httpTripInboundGateway"
                              request-channel="tripQuoteRequestsChannel"
                              reply-channel="tripQuoteResponseChannel"
-                             name="/httpquote/quote"
                              supported-methods="GET,POST"
                               />
    

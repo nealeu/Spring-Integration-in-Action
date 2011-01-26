@@ -110,7 +110,7 @@ public class SmsSubscriptionTest {
 	}
     
 	/**
-	 * Uses real RestTemplate when have done mvn jetty:run (or STS Run-> Run on Server)
+	 * Uses real RestTemplate when have done mvn jetty:run (or Eclipse/STS Run-> Run on Server)
 	 */
 	public static void main(String[] args) {
 		ResponseEntity<?> response = doRequest(new RestTemplate());
