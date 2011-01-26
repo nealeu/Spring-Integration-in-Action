@@ -1,7 +1,6 @@
 package com.manning.siia.http;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.*;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -25,13 +24,13 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.integration.Message;
 import org.springframework.integration.MessageChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.http.inbound.HttpRequestHandlingController;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartResolver;
 
@@ -44,7 +43,7 @@ public class SmsSubscriptionTest {
     private HttpServlet smsServlet;
 
     @Autowired
-    private HttpRequestHandler httpSmsSubscriptionInboundChannelAdapter;
+    private HttpRequestHandlingController httpSmsSubscriptionInboundChannelAdapter;
     
     @Autowired
     private MultipartResolver multipartResolver;
@@ -60,7 +59,7 @@ public class SmsSubscriptionTest {
 
 	@Test
     public void testFormSubmissionSucceedsAndCreatesMessage() throws Exception {
-		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/subscribe");
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/sms/subscribe");
 		MockHttpServletResponse response = new MockHttpServletResponse();
     	request.addParameter("smsNumber", "+1-612-555-1234");
     	request.addParameter("flight", "BA123");
@@ -84,7 +83,7 @@ public class SmsSubscriptionTest {
     }
 
 	
-	static private void doRequest(RestTemplate restTemplate) {
+	static private ResponseEntity<?> doRequest(RestTemplate restTemplate) {
 		MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<String, Object>();
 		multipartMap.add("smsNumber", "+1-612-555-1234");
 		multipartMap.add("flight", "BA123");             
@@ -93,8 +92,9 @@ public class SmsSubscriptionTest {
 		headers.setContentType(new MediaType("multipart", "form-data"));
 		HttpEntity<Object> request = new HttpEntity<Object>(multipartMap, headers);
 		
-		ResponseEntity<?> response = restTemplate.exchange("http://localhost:8080/siia-webapp/subscribe", HttpMethod.POST, request, null);
+		ResponseEntity<?> response = restTemplate.exchange("http://localhost:8080/siia-webapp/sms/subscribe", HttpMethod.POST, request, String.class);
     	assertThat(response.getStatusCode(), is(HttpStatus.OK));
+    	return response;
 	}
 
 	/**
@@ -113,6 +113,7 @@ public class SmsSubscriptionTest {
 	 * Uses real RestTemplate when have done mvn jetty:run (or STS Run-> Run on Server)
 	 */
 	public static void main(String[] args) {
-		doRequest(new RestTemplate());
+		ResponseEntity<?> response = doRequest(new RestTemplate());
+		System.out.println(response.getBody());
 	}
 }

@@ -12,11 +12,9 @@
     <int-http:inbound-channel-adapter id="httpSmsSubscriptionInboundChannelAdapter" 
         channel="smsSubscriptionsChannel"
         supported-methods="GET,POST" 
-        name="/subscribe"
+        name="/sms/subscribe"
+        view-name="confirmReceived"
         />
-        <!-- 
-        request-payload-type="com.manning.siia.domain.notification.UpdateSubscription"  
-         -->
         
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
     

@@ -55,7 +55,7 @@
 
     <servlet-mapping>
         <servlet-name>httpTripInboundGateway</servlet-name>
-        <url-pattern>/httpquote</url-pattern>
+        <url-pattern>/httpquote/*</url-pattern>
     </servlet-mapping>
 
 
@@ -67,7 +67,7 @@
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>
-                classpath:http-applicationContext.xml
+                /WEB-INF/sms-servlet.xml
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
