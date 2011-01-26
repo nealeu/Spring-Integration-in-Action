@@ -10,13 +10,13 @@
 		in the source of the blog <link rel="service.post" type="application/atom+xml" 
 		title="Flight Updates - Atom" href="http://www.blogger.com/feeds/{id}/posts/default" 
 		/> -->
-	<http:outbound-channel-adapter id="blogAdapter"
-		url="http://www.blogger.com/feeds/5800805938651950760/posts/default"
-		channel="flightUpdates"  
-		http-method="POST" 
-		charset="UTF-8"
-		expected-response-type="java.lang.String" 
-		extract-payload="false" />
+    <http:outbound-channel-adapter id="blogAdapter"
+        url="http://www.blogger.com/feeds/5800805938651950760/posts/default"
+        channel="flightUpdates"  
+        http-method="POST" 
+        charset="UTF-8"
+        expected-response-type="java.lang.String" 
+        extract-payload="false" />
 
 
 	<si:channel id="flightUpdates" />
