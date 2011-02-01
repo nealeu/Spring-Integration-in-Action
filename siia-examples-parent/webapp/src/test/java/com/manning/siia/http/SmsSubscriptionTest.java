@@ -133,6 +133,7 @@ public class SmsSubscriptionTest {
 		multipartMap.add("flightNumber", "BA123");             
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(new MediaType("multipart", "form-data"));
+		headers.set("throwException", "throwException");
 		HttpEntity<Object> request = new HttpEntity<Object>(multipartMap, headers);
 		
 		return restTemplate.exchange("http://localhost:8080/siia-webapp/sms/subscribe", HttpMethod.POST, request, bodyClass);

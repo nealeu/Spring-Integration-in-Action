@@ -32,5 +32,8 @@
 
     <int:channel  id="validatedSmsSubscriptionRequests" datatype="com.manning.siia.domain.notification.SmsSubscriptionRequest">
         <int:queue capacity="2"/>
+    	<int:interceptors>
+    		<bean class="com.manning.siia.ExceptionThrowingInterceptor" /> <!-- Throw an exception when wanted (TODO: Define in test scope not main)-->
+    	</int:interceptors>
     </int:channel> 
 </beans>
