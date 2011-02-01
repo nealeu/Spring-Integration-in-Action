@@ -32,7 +32,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartResolver;
 
 import com.manning.siia.mock.ServletWrappingClientHttpRequest;
 
@@ -78,11 +77,11 @@ public class SmsSubscriptionTest {
 	@Test
     public void testViaRestTemplate() {
 		RestTemplate restTemplate = getRestTemplate(smsServlet);
-		doRequest(restTemplate);
+		doRequest(restTemplate, null); // our servlet mock doesn't have the facilities to handle JSP - use Run On Server and execute main here to see response HTML
     }
 
 	
-	static private ResponseEntity<?> doRequest(RestTemplate restTemplate) {
+	static private ResponseEntity<?> doRequest(RestTemplate restTemplate, Class<?> bodyClass) {
 		MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<String, Object>();
 		multipartMap.add("smsNumber", "+1-612-555-1234");
 		multipartMap.add("flight", "BA123");             
@@ -91,7 +90,7 @@ public class SmsSubscriptionTest {
 		headers.setContentType(new MediaType("multipart", "form-data"));
 		HttpEntity<Object> request = new HttpEntity<Object>(multipartMap, headers);
 		
-		ResponseEntity<?> response = restTemplate.exchange("http://localhost:8080/siia-webapp/sms/subscribe", HttpMethod.POST, request, String.class);
+		ResponseEntity<?> response = restTemplate.exchange("http://localhost:8080/siia-webapp/sms/subscribe", HttpMethod.POST, request, bodyClass);
     	assertThat(response.getStatusCode(), is(HttpStatus.OK));
     	return response;
 	}
@@ -112,7 +111,7 @@ public class SmsSubscriptionTest {
 	 * Uses real RestTemplate when have done mvn jetty:run (or Eclipse/STS Run-> Run on Server)
 	 */
 	public static void main(String[] args) {
-		ResponseEntity<?> response = doRequest(new RestTemplate());
+		ResponseEntity<?> response = doRequest(new RestTemplate(), String.class);
 		System.out.println(response.getBody());
 	}
 }
