@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 
-    <bean id="smsServlet" class="com.manning.siia.http.ServletFactory" factory-method="getServlet">
+    <bean id="smsServlet" class="com.manning.siia.mock.ServletFactory" factory-method="getServlet">
         <constructor-arg name="servletName" value="httpSmsSubscriptionInboundChannelAdapter"/>
         <constructor-arg name="contextPath" value="/siia-webapp"/>
         <constructor-arg name="initParams" >

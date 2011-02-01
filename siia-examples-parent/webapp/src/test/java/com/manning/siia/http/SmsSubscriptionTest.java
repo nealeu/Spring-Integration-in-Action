@@ -34,6 +34,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartResolver;
 
+import com.manning.siia.mock.ServletWrappingClientHttpRequest;
+
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:http-applicationContext.xml","classpath:http-servlet-applicationContext-TEST.xml"})
@@ -45,9 +47,6 @@ public class SmsSubscriptionTest {
     @Autowired
     private HttpRequestHandlingController httpSmsSubscriptionInboundChannelAdapter;
     
-    @Autowired
-    private MultipartResolver multipartResolver;
-
     private MessagingTemplate channelTemplate;
     
 
@@ -104,7 +103,7 @@ public class SmsSubscriptionTest {
 		return new RestTemplate(new ClientHttpRequestFactory() {
 			@Override
 			public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-				return new ServletWrappingClientHttpRequest(uri, httpMethod, servlet, multipartResolver);
+				return new ServletWrappingClientHttpRequest(uri, httpMethod, servlet);
 			}
 		});
 	}

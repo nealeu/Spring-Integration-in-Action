@@ -1,4 +1,4 @@
-package com.manning.siia.http;
+package com.manning.siia.mock;
 
 import java.io.IOException;
 import java.net.URI;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,26 +16,26 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.util.Assert;
+import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.multipart.MultipartResolver;
 
 /**
- * {@link ClientHttpRequest} implementation that wraps {@link HttpServlet}
+ * {@link ClientHttpRequest} implementation that wraps a Spring {@link HttpRequestHandler}
  *
  * @author Neale Upstone
  */
-final class ServletWrappingClientHttpRequest extends AbstractClientHttpRequest {
+final class HandlerWrappingClientHttpRequest extends AbstractClientHttpRequest {
 
-	private HttpServlet servlet;
+	private HttpRequestHandler handler;
 	private URI uri;
 	private HttpMethod method;
 	private MultipartResolver multipartResolver;
 
 
-	ServletWrappingClientHttpRequest(URI uri, HttpMethod httpMethod, HttpServlet servlet, MultipartResolver multipartResolver) {
+	HandlerWrappingClientHttpRequest(URI uri, HttpMethod httpMethod, HttpRequestHandler handler, MultipartResolver multipartResolver) {
 		this.uri = uri;
 		this.method = httpMethod;
-		this.servlet = servlet;
+		this.handler = handler;
 		this.multipartResolver = multipartResolver;
 	}
 
@@ -55,15 +54,14 @@ final class ServletWrappingClientHttpRequest extends AbstractClientHttpRequest {
 		HttpServletRequest request = getRequest(headers, bufferedOutput);
 
 		
-//		Don't need the following if our servlet is aware of multipartResolver...
 		
-//		if (multipartResolver.isMultipart(request)) {
-//			request = multipartResolver.resolveMultipart(request);
-//		}
-//		
+		if (multipartResolver.isMultipart(request)) {
+			request = multipartResolver.resolveMultipart(request);
+		}
+		
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		try {
-			servlet.service(request, response);
+			handler.handleRequest(request, response);
 		}
 		catch (ServletException e) {
 			// relatively dumb but should do the job
@@ -77,11 +75,7 @@ final class ServletWrappingClientHttpRequest extends AbstractClientHttpRequest {
 
 
 	private MockHttpServletRequest getRequest(HttpHeaders headers, byte[] bufferedOutput) {
-		String contextPath = servlet.getServletContext().getContextPath();
-		String path = uri.getPath();
-		Assert.state(path.startsWith(contextPath), "request path must start with the context path of the servlet");
-		path = path.substring(contextPath.length());
-		MockHttpServletRequest request = new MockHttpServletRequest(method.toString(), path);
+		MockHttpServletRequest request = new MockHttpServletRequest(method.toString(), uri.getPath());
 
 		request.setContentType(headers.getContentType().toString());
 		request.setContent(bufferedOutput);

@@ -1,4 +1,4 @@
-package com.manning.siia.http;
+package com.manning.siia.mock;
 
 import java.util.Map;
 import java.util.Map.Entry;
