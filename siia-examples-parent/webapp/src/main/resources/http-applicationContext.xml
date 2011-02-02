@@ -26,7 +26,7 @@
     
     <int:channel id="smsSubscriptionRequests"  datatype="com.manning.siia.domain.notification.SmsSubscriptionRequest"/>
     
-    <int:filter id="validationFilter" expression="payload.mobileNumber.length > 0" throw-exception-on-rejection="true" 
+    <int:filter id="validationFilter" expression="payload.mobileNumber.startsWith('+')" throw-exception-on-rejection="true" 
     	input-channel="smsSubscriptionRequests" output-channel="validatedSmsSubscriptionRequests">
 	</int:filter>
 

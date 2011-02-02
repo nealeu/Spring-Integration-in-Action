@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,7 +74,12 @@ public class SmsSubscriptionTest {
 
 	@Test
     public void testFormSubmissionSucceedsAndCreatesMessage() throws Exception {
-		MockHttpServletResponse response = doRequest();
+		
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/sms/subscribe");
+    	request.addParameter("mobileNumber", "+1-612-555-1234");
+    	request.addParameter("flightNumber", "BA123");
+
+		MockHttpServletResponse response = doRequest(request);
     	assertEquals(200, response.getStatus());
     	
     	Message<Object> message = this.channelTemplate.receive();
@@ -82,24 +88,25 @@ public class SmsSubscriptionTest {
     }
 
 	@Test
-    public void testFormSubmissionFailsOnMessagingException() throws Exception {
-		this.testInterceptor.setExceptionClassToThrow(MessagingException.class);
-		MockHttpServletResponse response = doRequest();
+    public void testFormSubmissionFailsWithInvalidMobileNumber() throws Exception {
+		
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/sms/subscribe");
+    	request.addParameter("mobileNumber", "x1-612-555-1234");
+    	request.addParameter("flightNumber", "BA123");
+
+		MockHttpServletResponse response = doRequest(request);
     	assertEquals(200, response.getStatus());
     	
+    	// Expect no message
     	Message<Object> message = this.channelTemplate.receive();
-    	assertNotNull(message);
-    	Object payload = message.getPayload();
+    	assertNull(message);
     }
 
 	
 
-	private MockHttpServletResponse doRequest() throws Exception {
-		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/sms/subscribe");
-		MockHttpServletResponse response = new MockHttpServletResponse();
-    	request.addParameter("mobileNumber", "+1-612-555-1234");
-    	request.addParameter("flightNumber", "BA123");
+	private MockHttpServletResponse doRequest(HttpServletRequest request) throws Exception {
     	
+    	MockHttpServletResponse response = new MockHttpServletResponse();
     	ModelAndView mav = this.httpSmsSubscriptionInboundChannelAdapter.handleRequest(request, response);
     	if (mav.getModelMap().containsKey("errors")) {
     		Errors errors = (Errors)mav.getModelMap().get("errors");
@@ -129,7 +136,7 @@ public class SmsSubscriptionTest {
 	
 	static private ResponseEntity<?> doRequest(RestTemplate restTemplate, Class<?> bodyClass) {
 		MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<String, Object>();
-		multipartMap.add("mobileNumber", "+1-612-555-1234");
+		multipartMap.add("mobileNumber", "1-612-555-1234");
 		multipartMap.add("flightNumber", "BA123");             
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(new MediaType("multipart", "form-data"));
