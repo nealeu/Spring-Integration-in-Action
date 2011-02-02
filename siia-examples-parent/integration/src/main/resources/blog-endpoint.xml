@@ -15,17 +15,13 @@
         channel="flightUpdates"  
         http-method="POST" 
         charset="UTF-8"
-        expected-response-type="java.lang.String" 
-        extract-payload="false" />
+        />
 
 
 	<si:channel id="flightUpdates" />
-
-
     
 	<si:channel id="errorChannel">
 		<si:queue capacity="5"/>
 	</si:channel>
-
 
 </beans>

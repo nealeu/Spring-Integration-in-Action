@@ -1,8 +1,9 @@
 package com.manning.siia.integration;
 
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -12,9 +13,13 @@ import static org.mockito.Mockito.verify;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,6 +44,8 @@ import org.springframework.web.client.RestTemplate;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:blog-endpoint.xml"})
 public class BlogUpdatesTest {
+	
+	protected Log log = LogFactory.getLog(getClass());
 
     private MessagingTemplate channelTemplate;
 
@@ -47,7 +54,7 @@ public class BlogUpdatesTest {
 
 	private RestTemplate restTemplateSpy = spy(new RestTemplate());
 	
-	private String payload = 
+	static private final String payload = 
 		"<entry xmlns='http://www.w3.org/2005/Atom'>" +
 		"  <title type='text'>Flight xxx delayed</title>" +
 		"  <content type='xhtml'>" +
@@ -61,7 +68,7 @@ public class BlogUpdatesTest {
 	@Before 
     public void setUpMocks() throws IOException {
 
-		// TODO: This really should be exposed as is this is a common scenario
+		// No setter available, so we work around for testing (can be revised when SI 2.0.2 is released)
 		new DirectFieldAccessor(blogAdapter).setPropertyValue("restTemplate", restTemplateSpy);
 
     	reset(restTemplateSpy);
@@ -77,8 +84,17 @@ public class BlogUpdatesTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void testPostSucceedsWhenServerAvailable(){
-    	ResponseEntity<String> responseEntity = new ResponseEntity<String>("Ok", HttpStatus.CREATED);
-		doReturn(responseEntity).when(restTemplateSpy).exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class), any(Map.class));
+    	final ResponseEntity<String> responseEntity = new ResponseEntity<String>("Ok", HttpStatus.CREATED);
+		Answer<ResponseEntity<String>> answer = new Answer<ResponseEntity<String>>() {
+			@Override
+			public ResponseEntity<String> answer(InvocationOnMock invocation) throws Throwable {
+				HttpEntity<?> request = (HttpEntity<?>) invocation.getArguments()[2];
+				log.info("HTTP Request Body = " + request.getBody());
+				assertTrue("Body should contain our payload", request.getBody().equals(payload));
+				return responseEntity;
+			}
+		};
+		doAnswer(answer).when(restTemplateSpy).exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class), any(Map.class));
 
 		postFlightUpdate();
 		
