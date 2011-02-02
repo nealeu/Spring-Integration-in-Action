@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:int-http="http://www.springframework.org/schema/integration/http"
-    xmlns:int="http://www.springframework.org/schema/integration"
-    xsi:schemaLocation="http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.0.xsd
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xmlns:int-http="http://www.springframework.org/schema/integration/http"
+				xmlns:int="http://www.springframework.org/schema/integration"
+				xsi:schemaLocation="http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.0.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 
     <!-- This creates a bean that is a Spring HttpRequestHandler -->    
     <int-http:inbound-channel-adapter id="httpSmsSubscriptionInboundChannelAdapter" 
-        channel="smsSubscriptionsChannel"
+        channel="inboundHttpChannel"
         supported-methods="GET,POST" 
         name="/sms/subscribe"
-        view-name="confirmReceived"
+        view-name="confirmReceived" 
         />
         
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+    <int:channel id="inboundHttpChannel"/>
+
+	<int:map-to-object-transformer type="com.manning.siia.domain.notification.SmsSubscriptionRequest" 
+		input-channel="inboundHttpChannel"
+		output-channel="smsSubscriptionRequests"
+		/>
     
-    <int:channel id="smsSubscriptionsChannel">
+    <int:channel id="smsSubscriptionRequests"  datatype="com.manning.siia.domain.notification.SmsSubscriptionRequest"/>
+    
+    <int:filter id="validationFilter" expression="payload.mobileNumber.length > 0" throw-exception-on-rejection="true" 
+    	input-channel="smsSubscriptionRequests" output-channel="validatedSmsSubscriptionRequests">
+	</int:filter>
+
+    <int:channel  id="validatedSmsSubscriptionRequests" datatype="com.manning.siia.domain.notification.SmsSubscriptionRequest">
         <int:queue capacity="2"/>
     </int:channel> 
 </beans>

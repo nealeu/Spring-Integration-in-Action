@@ -68,7 +68,10 @@ public class BlogUpdatesTest {
 	@Before 
     public void setUpMocks() throws IOException {
 
-		// No setter available, so we work around for testing (can be revised when SI 2.0.2 is released)
+		// For SI >= 2.0.2, RestTemplate can be provided when constructing HttpRequestExecutingMessageHandler, but for creating spies, this
+		// is probably the easiest way to approach things, as we use the application context.
+		// The other approach would be to provide a default restTemplate to autowire in our main application context, and to override that bean
+		// in a test scoped application context
 		new DirectFieldAccessor(blogAdapter).setPropertyValue("restTemplate", restTemplateSpy);
 
     	reset(restTemplateSpy);

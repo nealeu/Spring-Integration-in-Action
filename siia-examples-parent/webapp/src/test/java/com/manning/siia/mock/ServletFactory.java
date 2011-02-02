@@ -44,6 +44,7 @@ public class ServletFactory {
 			final Map<String, String> initParams, HttpServlet servlet) throws ServletException {
 		
 		MockServletContext context = new MockServletContext();
+		context.setMinorVersion(5);
 		context.setContextPath(contextPath);
 		
 		MockServletConfig config = new MockServletConfig(context, servletName);
