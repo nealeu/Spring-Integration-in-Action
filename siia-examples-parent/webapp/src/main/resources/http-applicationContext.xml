@@ -9,13 +9,21 @@
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 
-    <!-- This creates a bean that is a Spring HttpRequestHandler -->    
-    <int-http:inbound-channel-adapter id="httpSmsSubscriptionInboundChannelAdapter" 
+    <!-- This creates a bean that is a Spring Controller -->    
+    <int-http:inbound-channel-adapter id="httpSmsSubscriptionController" 
         channel="inboundHttpChannel"
         supported-methods="GET,POST" 
         name="/sms/subscribe"
         view-name="confirmReceived" 
         />
+
+    <!-- This creates a bean that is a Spring HttpRequestHandler -->    
+    <int-http:inbound-channel-adapter id="httpSmsSubscriptionRequestHandler" 
+        channel="inboundHttpChannel"
+        supported-methods="GET,POST" 
+        name="/sms-api/subscribe"
+        />
+
         
     <int:channel id="inboundHttpChannel"/>
 
