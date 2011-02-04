@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xmlns:int-http="http://www.springframework.org/schema/integration/http"
-				xmlns:int="http://www.springframework.org/schema/integration"
-				xsi:schemaLocation="http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.0.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.0.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
@@ -24,6 +27,9 @@
         name="/sms-api/subscribe"
         />
 
+	<bean name="/static/*" class="org.springframework.web.servlet.resource.ResourceHttpRequestHandler" p:locations="/static/"  />
+	<!-- NOTE: mvc:resources has side effects we don't want - TRY it instead of line above! -->
+<!--	<mvc:resources location="/static/" mapping="/static/**"/>-->
         
     <int:channel id="inboundHttpChannel"/>
 
