@@ -11,7 +11,6 @@
 </head>
 <body>
 	<h2>Your subscription request was received</h2>
-	<form:errors></form:errors>
 	${errors}
 </body>
 </html>

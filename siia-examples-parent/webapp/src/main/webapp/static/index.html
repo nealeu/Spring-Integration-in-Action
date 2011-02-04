@@ -3,12 +3,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>Insert title here</title>
+<title>Subscribe to flight updates</title>
 </head>
 <body>
+	<h2>Try submitting each of these, and then delete the + a the beginning of the phone number to see what happens with exceptions</h2>
+	<p>POST to /sms/subscribe</p>
 	<form action="/siia-webapp/sms/subscribe" method="post">
-		<input type="text" name="mobileNumber" value="+1-123-344-5555"/>
-		<input type="text" name="flightNumber" value="BA987"/>
+		<input type="text" name="mobileNumber" value="+1-123-555-5555"/></br>
+		<input type="text" name="flightNumber" value="BA987"/></br>
+		<input type="submit" />
+	</form>
+	<p>POST to /sms-api/subscribe</p>
+	<form action="/siia-webapp/sms-api/subscribe" method="post">
+		<input type="text" name="mobileNumber" value="+1-123-555-5555"/></br>
+		<input type="text" name="flightNumber" value="BA987"/></br>
 		<input type="submit" />
 	</form>
 </body>
