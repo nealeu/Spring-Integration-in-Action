@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.integration.Message;
-import org.springframework.integration.MessagingException;
+import org.springframework.integration.MessageRejectedException;
 import org.springframework.integration.channel.AbstractMessageChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -79,7 +79,7 @@ public class RequestHandlerBasedSmsSubscriptionTest {
     	request.addParameter("mobileNumber", "x1-612-555-1234");
     	request.addParameter("flightNumber", "BA123");
 
-    	new AssertThrows(MessagingException.class) {
+    	new AssertThrows(MessageRejectedException.class) {
     		@Override
     		public void test() throws Exception {
     			doRequest(request);

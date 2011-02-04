@@ -1,7 +1,5 @@
 package com.manning.siia.domain.notification;
 
-import org.springframework.util.Assert;
-
 /**
  * Request to receive notifications of flight delays via text message
  */
@@ -15,7 +13,6 @@ public class SmsSubscriptionRequest {
 	}
 
 	public void setMobileNumber(String mobileNumber) {
-		Assert.isTrue(mobileNumber.startsWith("+"), "mobileNumber must start with +");
 		this.mobileNumber = mobileNumber;
 	}
 
